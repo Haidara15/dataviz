@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Thèmes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="{% url 'create_theme' %}">Créer une nouvelle thématique</a>
+    {% endif %}
+    <div class="row mt-4">
+        {% for theme in themes %}
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'theme_charts' theme_slug=theme.slug %}" style="text-decoration:none;">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ theme.title }}</h5>
+                    </div>
+                </div>
+            </a>
+            {% if user.is_authenticated and user.is_staff %}
+            <div class="d-flex align-items-center">
+                <a href="{% url 'edit_theme' theme_slug=theme.slug %}" class="btn btn-sm btn-success m-2">Modifier</a>
+                <a href="{% url 'delete_theme' theme_slug=theme.slug %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </div> 
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

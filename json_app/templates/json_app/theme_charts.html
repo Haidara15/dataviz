@@ -1,0 +1,80 @@
+
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<h1>{{ theme.title }}</h1>
+
+{% if user.is_authenticated and user.is_staff %}
+<a href="{% url 'theme_list' %}" style="margin-top:2%;">Retour à la liste des thématiques</a>
+<a href="{% url 'create_chart_data' theme_slug=theme.slug %}" style="margin-top:2%;margin-left:2%">Créer une nouvelle figure</a>
+{% endif %}
+
+
+{% for chart_data in charts_data %}
+<div style="box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;margin-top:2%;padding:20px;">
+    <h2>{{ chart_data.chart.title }}</h2>
+    <div id="container-{{ chart_data.chart.pk }}"></div>
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="{% url 'edit_chart_data' theme_slug=theme.slug pk=chart_data.chart.pk %}">Modifier la figure</a>
+    <a href="{% url 'delete_chart_data' theme_slug=theme.slug pk=chart_data.chart.pk %}" style="padding:20px;">Supprimer la figure</a> 
+    {% endif %}
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for chart_data in charts_data %}
+        var chartType = '{{ chart_data.chart.chart_type }}';
+        var showLegend = {% if chart_data.chart.show_legend %}true{% else %}false{% endif %};
+
+        var options = {
+            chart: {
+                type: chartType
+            },
+            title: {
+                text: '{{ chart_data.chart.title }}'
+            },
+            xAxis: {
+                categories: {{ chart_data.labels_json|safe }},
+                title: {
+                    text: '{{ chart_data.chart.x_axis_title|default_if_none:"" }}'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: '{{ chart_data.chart.y_axis_title|default_if_none:"" }}'
+                }
+            },
+            legend: {
+                enabled: showLegend,
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: '{{ chart_data.chart.legend_position }}'
+            },
+            series: [{
+                name: 'Values',
+                data: {{ chart_data.data_json|safe }}
+            }]
+        };
+
+        {% if chart_data.chart.chart_type == "pie" %}
+        delete options.legend.layout;
+        delete options.legend.align;
+        delete options.legend.verticalAlign;
+        options.plotOptions = {
+            pie: {
+                showInLegend: showLegend
+            }
+        };
+        {% endif %}
+
+        Highcharts.chart('container-{{ chart_data.chart.pk }}', options);
+        {% endfor %}
+    });
+</script>
+
+{% endfor %}
+
+{% endblock content %}

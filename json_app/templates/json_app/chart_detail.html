@@ -1,0 +1,35 @@
+<!-- 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ chart.title }}</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+    <h1>{{ chart.title }}</h1>
+    <div id="container"></div>
+    <a href="{% url 'theme_list' %}" style="margin:20px;">Retour à la liste des thématiques</a>
+    <a href="{% url 'create_chart_data' theme_slug=chart.theme.slug %}" style="margin:20px;">Créer une nouvelle figure</a>
+    <a href="{% url 'edit_chart_data' theme_slug=chart.theme.slug pk=chart.pk %}">Modifier la figure</a>
+    <a href="{% url 'delete_chart_data' theme_slug=theme.slug pk=chart_data.chart.pk %}">Supprimer</a> 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Highcharts.chart('container', {
+                chart: {
+                    type: '{{ chart.chart_type }}'
+                },
+                title: {
+                    text: '{{ chart.title }}'
+                },
+                xAxis: {
+                    categories: {{ labels_json|safe }}
+                },
+                series: [{
+                    name: 'Values',
+                    data: {{ data_json|safe }}
+                }]
+            });
+        });
+    </script>
+</body>
+</html> --> 

@@ -1,0 +1,18 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Modifier Thématique{% endblock %}
+
+{% block content %}
+ 
+<h1>Modification de la figure : {{ chart.title }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-sm btn-success mb-4">Enregistrer les modifications</button>
+</form>
+
+<a href="{% url 'theme_list' %}">Retour à la liste des thématiques</a>
+ 
+{% endblock content %}
