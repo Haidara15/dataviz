@@ -92,24 +92,41 @@ def chart_list(request):
 
 
 # views.py
+import json
+import ast
+from django.shortcuts import render, get_object_or_404
+from .models import Theme  # Assure-toi d'importer le bon modèle
+
 def theme_charts(request, theme_slug):
     theme = get_object_or_404(Theme, slug=theme_slug)
-    # charts = theme.charts.all()
-    charts = theme.charts.all().order_by('-modified_at', '-id')  # Trier par clé primaire en ordre décroissant
+    charts = theme.charts.all().order_by('-modified_at', '-id')
     charts_data = []
 
     for chart in charts:
-        labels = json.loads(chart.labels)
-        values = json.loads(chart.values)
-        values = [float(value) for value in values]
-        if chart.chart_type == 'pie':
-            values = [{'name': label, 'y': value} for label, value in zip(labels, values)]
-        
-        charts_data.append({
-            'chart': chart,
-            'labels_json': json.dumps(labels),
-            'data_json': json.dumps(values)
-        })
+        try:
+            try:
+                labels = json.loads(chart.labels)
+            except json.JSONDecodeError:
+                labels = ast.literal_eval(chart.labels)
+
+            try:
+                values = json.loads(chart.values)
+            except json.JSONDecodeError:
+                values = ast.literal_eval(chart.values)
+
+            values = [float(value) for value in values]
+
+            if chart.chart_type == 'pie':
+                values = [{'name': label, 'y': value} for label, value in zip(labels, values)]
+
+            charts_data.append({
+                'chart': chart,
+                'labels_json': json.dumps(labels),
+                'data_json': json.dumps(values)
+            })
+        except Exception as e:
+            print(f"Erreur lors du traitement du chart ID {chart.id} : {e}")
+            continue  # Ignore ce chart s’il y a un souci
 
     return render(request, 'json_app/theme_charts.html', {
         'theme': theme,

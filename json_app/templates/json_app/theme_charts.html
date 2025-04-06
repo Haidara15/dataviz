@@ -9,6 +9,9 @@
 {% if user.is_authenticated and user.is_staff %}
 <a href="{% url 'theme_list' %}" style="margin-top:2%;">Retour à la liste des thématiques</a>
 <a href="{% url 'create_chart_data' theme_slug=theme.slug %}" style="margin-top:2%;margin-left:2%">Créer une nouvelle figure</a>
+<a href="{% url 'importer_graphique_excel' slug=theme.slug %}" style="margin-top:2%;margin-left:2%">
+    📁 Importer un graphique depuis un fichier Excel
+</a>
 {% endif %}
 
 

@@ -1,0 +1,49 @@
+<h2>Configurer le graphique pour le thème "{{ theme.nom }}"</h2>
+<form id="form-colonnes" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="2">
+    {{ form.as_p }}
+    <button type="button" onclick="genererPreview()">Prévisualiser</button>
+    <button type="submit">Créer le graphique</button>
+</form>
+
+<hr>
+<canvas id="graphPreview" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function genererPreview() {
+    const form = document.getElementById('form-colonnes');
+    const type = form.querySelector('[name="type_graphique"]').value;
+    const xCol = form.querySelector('[name="colonne_x"]').value;
+    const yCols = Array.from(form.querySelectorAll('[name="colonnes_y"]:checked')).map(cb => cb.value);
+
+    fetch("{% url 'preview_graph_api' %}", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ colonne_x: xCol, colonnes_y: yCols, type_graphique: type })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('graphPreview').getContext('2d');
+        if (window.graphPreviewInstance) window.graphPreviewInstance.destroy();
+        window.graphPreviewInstance = new Chart(ctx, {
+            type: type === "pie" ? "pie" : "bar",
+            data: {
+                labels: data.labels,
+                datasets: data.datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Aperçu du graphique' }
+                }
+            }
+        });
+    });
+}
+</script>
