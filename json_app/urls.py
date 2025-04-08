@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.theme_list, name='theme_list'),
     path('nouvelle/', views.create_theme, name='create_theme'),
+    path('theme/<slug:theme_slug>/save-grid-layout/', views.save_grid_layout, name='save_grid_layout'),
     
 ]
 

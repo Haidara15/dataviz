@@ -184,3 +184,34 @@ def edit_theme(request, theme_slug):
 
 
 
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from .models import HighchartData, Theme
+
+
+
+@csrf_exempt
+def save_grid_layout(request, theme_slug):
+    if request.method == 'POST' and request.user.is_authenticated and request.user.is_staff:
+        data = json.loads(request.body)
+        layout = data.get('layout', [])
+        for item in layout:
+            try:
+                chart = HighchartData.objects.get(pk=item['id'], theme__slug=theme_slug)
+                chart.pos_x = item['x']
+                chart.pos_y = item['y']
+                chart.width = item['w']
+                chart.height = item['h']
+                chart.save()
+            except HighchartData.DoesNotExist:
+                continue
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'forbidden'}, status=403)
+
+
+
+
+
+

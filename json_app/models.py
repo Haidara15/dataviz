@@ -46,6 +46,11 @@ class HighchartData(models.Model):
     y_axis_title = models.CharField(max_length=50, blank=True, null=True)
     show_legend = models.BooleanField(default=False)
     legend_position = models.CharField(max_length=10, choices=[('top', 'Haut'), ('bottom', 'Bas')], default='top')
+
+    pos_x = models.IntegerField(default=0)
+    pos_y = models.IntegerField(default=0)
+    width = models.IntegerField(default=6)
+    height = models.IntegerField(default=4)
     
 
     modified_at = models.DateTimeField(auto_now=True)
